@@ -133,33 +133,35 @@ class ShopFlowTest < ActionDispatch::IntegrationTest
     assert_match product.image_url, response.body
   end
 
-  test 'seller chooses a category and buyers can filter listings' do
+  test 'seller can enter and edit a custom brand without category or finish' do
     sign_in @seller
     get new_product_path
-    assert_select 'select[name="product[category]"]'
+    assert_select 'input[name="product[brand]"][list="brand-suggestions"]'
+    assert_select 'datalist#brand-suggestions option[value="Fender"]'
+    assert_select 'select[name="product[category]"]', count: 0
+    assert_select 'select[name="product[finish]"]', count: 0
 
-    post products_path, params: { product: product_attributes('Roadster').merge(category: 'Cars') }
+    post products_path, params: { product: product_attributes('Roadster').merge(brand: 'My Brand') }
     assert_response :redirect
     roadster = Product.find_by!(title: 'Roadster')
-    assert_equal 'Cars', roadster.category
+    assert_equal 'My Brand', roadster.brand
 
-    get products_path, params: { category: 'Cars' }
+    get new_product_path
+    assert_select 'datalist#brand-suggestions option[value="My Brand"]'
+
+    get product_path(roadster)
     assert_response :success
-    assert_match 'Roadster', response.body
-    assert_no_match(/Camera/, response.body)
+    assert_match 'My Brand', response.body
 
-    patch product_path(roadster), params: { product: { category: 'Electronics' } }
+    patch product_path(roadster), params: { product: { brand: 'Acme & Co' } }
     assert_response :redirect
-    assert_equal 'Electronics', roadster.reload.category
-    get products_path, params: { category: 'Cars' }
-    assert_no_match(/Roadster/, response.body)
+    assert_equal 'Acme & Co', roadster.reload.brand
 
-    get products_path, params: { category: 'Clothing' }
-    assert_match 'No products in this category yet.', response.body
-
-    post products_path, params: { product: product_attributes('Uncategorized').except(:category) }
+    post products_path, params: { product: product_attributes('No brand').merge(brand: '') }
     assert_response :unprocessable_entity
-    assert_not Product.exists?(title: 'Uncategorized')
+    assert_not Product.exists?(title: 'No brand')
+    assert_not_includes Product.column_names, 'category'
+    assert_not_includes Product.column_names, 'finish'
   end
 
   private
@@ -170,6 +172,6 @@ class ShopFlowTest < ActionDispatch::IntegrationTest
 
   def product_attributes(title)
     { title: title, price: 25, brand: 'Fossil', model: 'A1',
-      description: 'Working item', condition: 'Used', finish: 'Black', category: 'Other' }
+      description: 'Working item', condition: 'Used' }
   end
 end

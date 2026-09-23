@@ -10,20 +10,8 @@
 </section>
 <% end %>
 
-<section class="section pb0">
-  <%= form_with url: products_path, method: :get, local: true, class: 'field is-grouped is-align-items-end' do %>
-    <div class="control">
-      <%= label_tag :category, 'Category', class: 'label' %>
-      <div class="select">
-        <%= select_tag :category, options_for_select([['All categories', '']] + Product::CATEGORIES, @selected_category) %>
-      </div>
-    </div>
-    <div class="control"><%= submit_tag 'Filter', name: nil, class: 'button is-dark' %></div>
-  <% end %>
-</section>
-
 <% if @products.empty? %>
-  <p class="has-text-centered mt4">No products in this category yet.</p>
+  <p class="has-text-centered mt4">No products yet.</p>
 <% end %>
 
 <div class="product-index-grid pt4">
@@ -43,8 +31,6 @@
     <div class="pa3">
 
       <h3 class="fw7 f4 title"><%= link_to product.title, product %></h3>
-
-      <span class="tag is-light"><%= product.category %></span>
 
       <p class="has-text-gray fg pt1">Sold by: <%= product_author(product) %></p>
 

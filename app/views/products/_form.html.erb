@@ -32,43 +32,21 @@
           </div>
         </div>
 
-        <div class="field">
-          <div class="control">
-            <%= f.input :category, collection: Product::CATEGORIES, prompt: 'Select category',
-                  required: true, input_html: { class: 'select' } %>
-          </div>
-        </div>
-
         <div class="columns">
-          <div class="field column is-4">
+          <div class="field column is-6">
             <div class="control">
-              <label class="label">Brand</label>
-              <div class="control has-icons-left">
-                <span class="select">
-                  <%= f.input_field :brand, collection: Product::BRAND, prompt: "Select brand" %>
-                </span>
-                <span class="icon is-small is-left">
-                  <i class="fa fa-tag"></i>
-                </span>
-              </div>
+              <%= f.input :brand, required: true, hint: 'Choose a suggestion or enter your own brand',
+                    input_html: { class: 'input', list: 'brand-suggestions' }, wrapper: false,
+                    label_html: { class: 'label' } %>
+              <datalist id="brand-suggestions">
+                <% Product.brand_suggestions.each do |brand| %>
+                  <option value="<%= brand %>"></option>
+                <% end %>
+              </datalist>
             </div>
            </div>
 
-          <div class="field column is-4">
-            <div class="control">
-              <label class="label">Finish</label>
-              <div class="control has-icons-left">
-                <span class="select">
-                  <%= f.input_field :finish, collection: Product::FINISH, prompt: "Select finish" %>
-                </span>
-                <span class="icon is-small is-left">
-                  <i class="fa fa-paint-brush"></i>
-                </span>
-              </div>
-            </div>
-           </div>
-
-          <div class="field column is-4">
+          <div class="field column is-6">
             <div class="control">
               <label class="label">Condition</label>
               <div class="control has-icons-left">

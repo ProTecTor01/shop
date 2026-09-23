@@ -30,23 +30,11 @@
       <h3 class="subtitle is-4 pt5">Product Specs</h3>
 
       <table class="table is-narrow">
-        <tr>
-          <td class="has-text-weight-bold">Category:</td>
-          <td><%= @product.category %></td>
-        </tr>
-
         <% if @product.condition %>
         <tr>
           <td class="has-text-weight-bold">Condition:</td>
           <td><%= @product.condition %></td>
         </tr>
-        <% end %>
-
-        <% if @product.finish %>
-          <tr>
-            <td class="has-text-weight-bold">Finish:</td>
-            <td><%= @product.finish %></td>
-          </tr>
         <% end %>
 
         <% if @product.brand %>
