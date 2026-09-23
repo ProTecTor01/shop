@@ -1,0 +1,31 @@
+<section class="section">
+  <h1 class="title">Your cart</h1>
+
+  <% if @line_items.empty? %>
+    <p>Your cart is empty.</p>
+  <% else %>
+    <table class="table is-fullwidth">
+      <thead>
+        <tr><th>Product</th><th>Seller</th><th>Quantity</th><th>Price</th><th></th></tr>
+      </thead>
+      <tbody>
+        <% @line_items.each do |item| %>
+          <tr>
+            <td><%= link_to item.product.title, item.product %></td>
+            <td><%= product_author(item.product) %></td>
+            <td><%= item.quantity %></td>
+            <td><%= number_to_currency(item.product.price * item.quantity) %></td>
+            <td><%= button_to 'Remove one', line_item_path(item), method: :delete, class: 'button is-small' %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% end %>
+
+  <p class="title is-4">Total: <%= number_to_currency(@cart.total_price) %></p>
+  <% if @line_items.any? %>
+    <%= button_to 'Empty Cart', cart_path, method: :delete,
+          form: { onsubmit: "return confirm('Are you sure?')" }, class: 'button is-danger' %>
+  <% end %>
+  <%= link_to 'Continue shopping', root_path, class: 'button is-light mt3' %>
+</section>
