@@ -133,6 +133,35 @@ class ShopFlowTest < ActionDispatch::IntegrationTest
     assert_match product.image_url, response.body
   end
 
+  test 'seller chooses a category and buyers can filter listings' do
+    sign_in @seller
+    get new_product_path
+    assert_select 'select[name="product[category]"]'
+
+    post products_path, params: { product: product_attributes('Roadster').merge(category: 'Cars') }
+    assert_response :redirect
+    roadster = Product.find_by!(title: 'Roadster')
+    assert_equal 'Cars', roadster.category
+
+    get products_path, params: { category: 'Cars' }
+    assert_response :success
+    assert_match 'Roadster', response.body
+    assert_no_match(/Camera/, response.body)
+
+    patch product_path(roadster), params: { product: { category: 'Electronics' } }
+    assert_response :redirect
+    assert_equal 'Electronics', roadster.reload.category
+    get products_path, params: { category: 'Cars' }
+    assert_no_match(/Roadster/, response.body)
+
+    get products_path, params: { category: 'Clothing' }
+    assert_match 'No products in this category yet.', response.body
+
+    post products_path, params: { product: product_attributes('Uncategorized').except(:category) }
+    assert_response :unprocessable_entity
+    assert_not Product.exists?(title: 'Uncategorized')
+  end
+
   private
 
   def product_for(user, title, price)
@@ -141,6 +170,6 @@ class ShopFlowTest < ActionDispatch::IntegrationTest
 
   def product_attributes(title)
     { title: title, price: 25, brand: 'Fossil', model: 'A1',
-      description: 'Working item', condition: 'Used', finish: 'Black' }
+      description: 'Working item', condition: 'Used', finish: 'Black', category: 'Other' }
   end
 end
